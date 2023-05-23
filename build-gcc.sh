@@ -98,7 +98,7 @@ build_gcc() {
     --with-headers="/usr/include" \
     --with-linker-hash-style=gnu \
     --with-newlib \
-    --with-pkgversion="Eva GCC" \
+    --with-pkgversion="SAMBEN GCC" \
     --with-sysroot
 
   make all-gcc -j$(nproc --all)
