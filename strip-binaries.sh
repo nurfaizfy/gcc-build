@@ -3,7 +3,7 @@
 CUR_DIR=$(pwd)
 X86S=$(which strip)
 A64S=$(which aarch64-linux-gnu-strip)
-A32S=$(which arm-linux-gnu-strip)
+A32S=$(which arm-linux-gnueabi-strip)
 
 find "$CUR_DIR" -type f -exec file {} \; >.file-idx
 
