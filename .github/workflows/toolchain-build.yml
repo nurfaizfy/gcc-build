@@ -25,8 +25,8 @@ jobs:
         script_dir=$(pwd)
         git config --global user.name "${GITHUB_USER}"
         git config --global user.email "${GITHUB_EMAIL}"
-        git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_USER}"/gcc-arm64 ../gcc-arm64 -b gcc-latest
-        git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_USER}"/gcc-arm ../gcc-arm -b gcc-latest
+        git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_USER}"/gcc-arm64 ../gcc-arm64 -b gcc-latest --depth 5
+        git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_USER}"/gcc-arm ../gcc-arm -b gcc-latest --depth 5
         rm -rf ../gcc-arm64/*
         rm -rf ../gcc-arm/*
         chmod a+x build-*.sh
