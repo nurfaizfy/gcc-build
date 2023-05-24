@@ -24,8 +24,8 @@ case "${arch}" in
 esac
 
 export WORK_DIR="$PWD"
-export PREFIX="$WORK_DIR/../gcc-${arch}"
-export PATH="$PREFIX/bin:/usr/bin/core_perl:$PATH"
+export PREFIX="${WORK_DIR}/../gcc-${arch}"
+export PATH="${PREFIX}/bin:/usr/bin/core_perl:${PATH}"
 export OPT_FLAGS="-flto -flto-compression-level=10 -O3 -pipe -ffunction-sections -fdata-sections"
 
 echo "||                                                                    ||"
@@ -42,11 +42,10 @@ send_info(){
 }
 
 build_binutils() {
-  cd "${WORK_DIR}"
   echo "Building Binutils"
   send_info "Starting [ ${arch} / ${TARGET} ] Binutils build"
-  mkdir build-binutils
-  cd build-binutils
+  mkdir ${WORK_DIR}/build-binutils
+  pushd ${WORK_DIR}/build-binutils
   env CFLAGS="$OPT_FLAGS" CXXFLAGS="$OPT_FLAGS" \
     ../binutils/configure --target=$TARGET \
     --disable-docs \
@@ -59,16 +58,15 @@ build_binutils() {
     --with-sysroot
   make -j$(nproc --all)
   make install -j$(nproc --all)
-  cd ../
-  echo "Built Binutils, proceeding to next step...."
+  echo "Built Binutils!"
+  popd
 }
 
 build_gcc() {
-  cd "${WORK_DIR}"
   echo "Building GCC"
   send_info "Starting [ ${arch} / ${TARGET} ] GCC build"
-  mkdir build-gcc
-  cd build-gcc
+  mkdir ${WORK_DIR}/build-gcc
+  pushd ${WORK_DIR}/build-gcc
   env CFLAGS="$OPT_FLAGS" CXXFLAGS="$OPT_FLAGS" \
     ../gcc/configure --target=$TARGET \
     --disable-decimal-float \
@@ -98,7 +96,16 @@ build_gcc() {
   make install-gcc -j$(nproc --all)
   make install-target-libgcc -j$(nproc --all)
   echo "Built GCC!"
+  popd
+}
+
+strip_binaries(){
+  pushd ${PREFIX}
+  ${PREFIX}/bin/${TARGET}-gcc -v 2>&1 | tee /tmp/gcc-version
+  ${WORK_DIR}/strip-binaries.sh
+  popd
 }
 
 build_binutils
 build_gcc
+strip_binaries

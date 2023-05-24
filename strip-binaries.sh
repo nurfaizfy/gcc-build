@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 CUR_DIR=$(pwd)
 X86S=$(which strip)

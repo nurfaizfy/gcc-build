@@ -22,7 +22,6 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build & Push
       run: |
-        script_dir=$(pwd)
         git config --global user.name "${GITHUB_USER}"
         git config --global user.email "${GITHUB_EMAIL}"
         git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_USER}"/gcc-arm64 ../gcc-arm64 -b gcc-latest --depth 5
@@ -31,19 +30,12 @@ jobs:
         rm -rf ../gcc-arm/*
         ./download-resources.sh
         ./build-gcc.sh -a arm64
-        cd ../gcc-arm64
-        ./bin/aarch64-elf-gcc -v 2>&1 | tee /tmp/gcc-version
-        bash "$script_dir/strip-binaries.sh"
         git add . -f
         git commit -as -m "Import ARM64 GCC ${{ steps.get-date.outputs.date }}" -m "Build completed on: $(/bin/date)" -m "Configuration: $(/bin/cat /tmp/gcc-version)"
         git push origin gcc-latest -f
-        cd $script_dir
         ./build-gcc.sh -a arm
-        cd ../gcc-arm
-        ./bin/arm-eabi-gcc -v 2>&1 | tee /tmp/gcc-arm-version
-        bash "$script_dir/strip-binaries.sh"
         git add . -f
-        git commit -as -m "Import ARM GCC ${{ steps.get-date.outputs.date }}" -m "Build completed on: $(/bin/date)" -m "Configuration: $(/bin/cat /tmp/gcc-arm-version)"
+        git commit -as -m "Import ARM GCC ${{ steps.get-date.outputs.date }}" -m "Build completed on: $(/bin/date)" -m "Configuration: $(/bin/cat /tmp/gcc-version)"
         git push origin gcc-latest -f
 
     - uses: yanzay/notify-telegram@v0.1.0
