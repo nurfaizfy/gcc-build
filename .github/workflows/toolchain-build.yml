@@ -30,13 +30,7 @@ jobs:
         rm -rf ../gcc-arm/*
         ./download-resources.sh
         ./build-gcc.sh -a arm64
-        git add . -f
-        git commit -as -m "Import ARM64 GCC ${{ steps.get-date.outputs.date }}" -m "Build completed on: $(/bin/date)" -m "Configuration: $(/bin/cat /tmp/gcc-version)"
-        git push origin gcc-latest -f
         ./build-gcc.sh -a arm
-        git add . -f
-        git commit -as -m "Import ARM GCC ${{ steps.get-date.outputs.date }}" -m "Build completed on: $(/bin/date)" -m "Configuration: $(/bin/cat /tmp/gcc-version)"
-        git push origin gcc-latest -f
 
     - uses: yanzay/notify-telegram@v0.1.0
       if: always()

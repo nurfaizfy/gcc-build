@@ -109,6 +109,19 @@ strip_binaries(){
   popd
 }
 
+git_push(){
+  pushd ${PREFIX}
+  send_info "Pushing into Github"
+  git add . -f
+  git commit -as \
+    -m "Import GCC $(date +%Y%m%d)" \
+    -m "Build completed on: $(date)" \
+    -m "Configuration: $(cat /tmp/gcc-version)"
+  git push origin gcc-latest -f
+  popd
+}
+
 build_binutils
 build_gcc
 strip_binaries
+git_push
