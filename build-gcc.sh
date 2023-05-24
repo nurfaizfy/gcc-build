@@ -32,9 +32,19 @@ echo "||                                                                    ||"
 echo "|| Building Bare Metal Toolchain for ${arch} with ${TARGET} as target ||"
 echo "||                                                                    ||"
 
+send_info(){
+  MESSAGE=$1
+  curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+    -d chat_id="${CHAT_ID}" \
+    -d "disable_web_page_preview=true" \
+    -d "parse_mode=html" \
+    -d text="<b>${MESSAGE}</b>"
+}
+
 build_binutils() {
   cd "${WORK_DIR}"
   echo "Building Binutils"
+  send_info "Starting [ ${arch} / ${TARGET} ] Binutils build"
   mkdir build-binutils
   cd build-binutils
   env CFLAGS="$OPT_FLAGS" CXXFLAGS="$OPT_FLAGS" \
@@ -56,6 +66,7 @@ build_binutils() {
 build_gcc() {
   cd "${WORK_DIR}"
   echo "Building GCC"
+  send_info "Starting [ ${arch} / ${TARGET} ] GCC build"
   mkdir build-gcc
   cd build-gcc
   env CFLAGS="$OPT_FLAGS" CXXFLAGS="$OPT_FLAGS" \

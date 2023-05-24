@@ -30,7 +30,6 @@ jobs:
         rm -rf ../gcc-arm64/*
         rm -rf ../gcc-arm/*
         ./download-resources.sh
-        curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" -d chat_id="${CHAT_ID}" -d "disable_web_page_preview=true" -d "parse_mode=html" -d text="<b>Starting ARM64 GCC Build</b>"
         ./build-gcc.sh -a arm64
         cd ../gcc-arm64
         ./bin/aarch64-elf-gcc -v 2>&1 | tee /tmp/gcc-version
@@ -39,7 +38,6 @@ jobs:
         git commit -as -m "Import ARM64 GCC ${{ steps.get-date.outputs.date }}" -m "Build completed on: $(/bin/date)" -m "Configuration: $(/bin/cat /tmp/gcc-version)"
         git push origin gcc-latest -f
         cd $script_dir
-        curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" -d chat_id="${CHAT_ID}" -d "disable_web_page_preview=true" -d "parse_mode=html" -d text="<b>Starting ARM (32-bit) GCC Build</b>"
         ./build-gcc.sh -a arm
         cd ../gcc-arm
         ./bin/arm-eabi-gcc -v 2>&1 | tee /tmp/gcc-arm-version
@@ -47,7 +45,6 @@ jobs:
         git add . -f
         git commit -as -m "Import ARM GCC ${{ steps.get-date.outputs.date }}" -m "Build completed on: $(/bin/date)" -m "Configuration: $(/bin/cat /tmp/gcc-arm-version)"
         git push origin gcc-latest -f
-        curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" -d chat_id="${CHAT_ID}" -d "disable_web_page_preview=true" -d "parse_mode=html" -d text="It's $(date +%A) my dudes!"
 
     - uses: yanzay/notify-telegram@v0.1.0
       if: always()
