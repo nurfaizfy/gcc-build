@@ -12,7 +12,9 @@ download() {
   git clone git://gcc.gnu.org/git/gcc.git -b master gcc --depth=1
   cd gcc
   ./contrib/download_prerequisites
-  cd ../
+  cd ..
+  echo "Cloning Zstd"
+  git clone https://github.com/facebook/zstd -b v1.5.5 zstd --depth=1
 }
 
 download

@@ -29,7 +29,7 @@ export PATH="${PREFIX}/bin:/usr/bin/core_perl:${PATH}"
 export OPT_FLAGS="-O3 -pipe -ffunction-sections -fdata-sections"
 
 echo "Cleaning up previous build directory..."
-rm -rf ${WORK_DIR}/{build-binutils,build-gcc}
+rm -rf ${WORK_DIR}/{build-binutils,build-gcc,build-zstd}
 
 echo "||                                                                    ||"
 echo "|| Building Bare Metal Toolchain for ${arch} with ${TARGET} as target ||"
@@ -42,6 +42,17 @@ send_info(){
     -d "disable_web_page_preview=true" \
     -d "parse_mode=html" \
     -d text="<b>${MESSAGE}</b>"
+}
+
+build_zstd() {
+  echo "Building zstd"
+  send_info "Starting Zstd build"
+  mkdir ${WORK_DIR}/build-zstd
+  pushd ${WORK_DIR}/build-zstd
+  cmake ${WORK_DIR}/zstd/build/cmake -DCMAKE_INSTALL_PREFIX:PATH="${PREFIX}"
+  make CFLAGS="-O3" CXXFLAGS="-O3" -j$(nproc --all)
+  make install -j$(nproc --all)
+  popd
 }
 
 build_binutils() {
@@ -92,7 +103,10 @@ build_gcc() {
     --with-linker-hash-style=gnu \
     --with-newlib \
     --with-pkgversion="SAMBEN GCC" \
-    --with-sysroot
+    --with-sysroot \
+    --with-zstd="${PREFIX}" \
+    --with-zstd-include="${PREFIX}/include" \
+    --with-zstd-lib="${PREFIX}/lib"
 
   make all-gcc -j$(nproc --all)
   make all-target-libgcc -j$(nproc --all)
@@ -121,6 +135,7 @@ git_push(){
   popd
 }
 
+build_zstd
 build_binutils
 build_gcc
 strip_binaries
