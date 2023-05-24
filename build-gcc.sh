@@ -28,24 +28,9 @@ export PREFIX="$WORK_DIR/../gcc-${arch}"
 export PATH="$PREFIX/bin:/usr/bin/core_perl:$PATH"
 export OPT_FLAGS="-flto -flto-compression-level=10 -O3 -pipe -ffunction-sections -fdata-sections"
 
-echo "Cleaning up previously cloned repos..."
-rm -rf $WORK_DIR/{binutils,build-binutils,build-gcc,gcc}
-
 echo "||                                                                    ||"
 echo "|| Building Bare Metal Toolchain for ${arch} with ${TARGET} as target ||"
 echo "||                                                                    ||"
-
-download_resources() {
-  echo "Downloading Pre-requisites"
-  echo "Cloning binutils"
-  git clone git://sourceware.org/git/binutils-gdb.git -b master binutils --depth=1
-  sed -i '/^development=/s/true/false/' binutils/bfd/development.sh
-  echo "Cloned binutils!"
-  echo "Cloning GCC"
-  git clone git://gcc.gnu.org/git/gcc.git -b master gcc --depth=1
-  cd "${WORK_DIR}"
-  echo "Downloaded prerequisites!"
-}
 
 build_binutils() {
   cd "${WORK_DIR}"
@@ -71,10 +56,6 @@ build_binutils() {
 build_gcc() {
   cd "${WORK_DIR}"
   echo "Building GCC"
-  cd gcc
-  ./contrib/download_prerequisites
-  echo "Bleeding Edge" > gcc/DEV-PHASE
-  cd ../
   mkdir build-gcc
   cd build-gcc
   env CFLAGS="$OPT_FLAGS" CXXFLAGS="$OPT_FLAGS" \
@@ -108,6 +89,5 @@ build_gcc() {
   echo "Built GCC!"
 }
 
-download_resources
 build_binutils
 build_gcc
