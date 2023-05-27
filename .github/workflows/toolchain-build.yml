@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
   schedule:
-    - cron: '0 6 * * 6'
+    - cron: '0 6 * * 0,2,4,6'
 
 env:
       GITHUB_EMAIL: ${{ secrets.EMAIL }}
@@ -20,21 +20,7 @@ jobs:
       image: diazaji/debian:gcc
     steps:
     - uses: actions/checkout@v3
-    - name: Build & Push
-      run: |
-        git config --global user.name "${GITHUB_USER}"
-        git config --global user.email "${GITHUB_EMAIL}"
-        git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_USER}"/gcc-arm64 ../gcc-arm64 -b gcc-latest --depth 5
-        git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_USER}"/gcc-arm ../gcc-arm -b gcc-latest --depth 5
-        rm -rf ../gcc-arm64/*
-        rm -rf ../gcc-arm/*
-        ./download-resources.sh
-        ./build-gcc.sh -a arm64
-        ./build-gcc.sh -a arm
-
-    - uses: yanzay/notify-telegram@v0.1.0
-      if: always()
-      with:
-        chat: ${{ secrets.CHAT }} # user id or channel name secret
-        token: ${{ secrets.TELEGRAM_BOT_TOKEN }} # token secret
-        status: ${{ job.status }} # do not modify this line
+    - name: Download Resources
+      run: ./download-resources.sh
+    - name: Build & Release
+      run: ./build-gcc.sh
