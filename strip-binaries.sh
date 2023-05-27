@@ -1,25 +1,23 @@
 #!/usr/bin/env bash
 
-CUR_DIR=$(pwd)
-X86S=$(which strip)
-A64S=$(which aarch64-linux-gnu-strip)
-A32S=$(which arm-linux-gnueabi-strip)
+cp ./install/bin/x86_64-elf-strip ./stripp-x86
+cp ./install/bin/aarch64-elf-strip ./stripp-a64
+cp ./install/bin/arm-eabi-strip ./stripp-a32
+find install -type f -exec file {} \; > .file-idx
 
-find "$CUR_DIR" -type f -exec file {} \; >.file-idx
-
-grep "x86" .file-idx |
-	grep "not strip" | grep -v "relocatable" |
+grep "x86-64" .file-idx |
+	grep "not strip" |
 	tr ':' ' ' | awk '{print $1}' |
-	while read -r file; do $X86S "$file"; done
+	while read -r file; do ./stripp-x86 -s "$file"; done
 
 grep "ARM" .file-idx | grep "aarch64" |
-	grep "not strip" | grep -v "relocatable" |
+	grep "not strip" |
 	tr ':' ' ' | awk '{print $1}' |
-	while read -r file; do $A64S "$file"; done
+	while read -r file; do ./stripp-a64 -s "$file"; done
 
-grep "ARM" .file-idx | grep "32.bit" |
-	grep "not strip" | grep -v "relocatable" |
+grep "ARM" .file-idx | grep "eabi" |
+	grep "not strip" |
 	tr ':' ' ' | awk '{print $1}' |
-	while read -r file; do $A32S "$file"; done
+	while read -r file; do ./stripp-a32 -s "$file"; done
 
-rm ".file-idx"
+rm ".file-idx" stripp-*

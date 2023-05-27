@@ -116,10 +116,8 @@ build_gcc() {
 
 strip_binaries(){
   send_info "<pre>GitHub Action       : Strip binaries . . .</pre>"
-  pushd ${PREFIX}
   ${PREFIX}/bin/aarch64-elf-gcc -v 2>&1 | tee /tmp/gcc-version
   ${WORK_DIR}/strip-binaries.sh
-  popd
 }
 
 git_push(){
