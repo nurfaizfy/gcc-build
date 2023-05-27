@@ -31,6 +31,7 @@ build_zstd() {
   make CFLAGS="-O3" CXXFLAGS="-O3" -j$(nproc --all)
   make install -j$(nproc --all)
   popd
+  rm -rf ${WORK_DIR}/build-zstd
   send_info "<pre>GitHub Action       : Zstd build finished ! ! !</pre>"
 }
 
@@ -60,8 +61,9 @@ build_binutils() {
     --with-sysroot
   make -j$(nproc --all)
   make install -j$(nproc --all)
-  send_info "<pre>GitHub Action       : Binutils build finished ! ! !</pre>"
   popd
+  rm -rf ${WORK_DIR}/build-binutils-${ARCH}
+  send_info "<pre>GitHub Action       : Binutils build finished ! ! !</pre>"
 }
 
 build_gcc() {
@@ -109,9 +111,9 @@ build_gcc() {
   make all-target-libgcc -j$(nproc --all)
   make install-gcc -j$(nproc --all)
   make install-target-libgcc -j$(nproc --all)
-  echo "Built GCC!"
-  send_info "<pre>GitHub Action       : GCC build finished ! ! !</pre>"
   popd
+  rm -rf ${WORK_DIR}/build-gcc-${ARCH}
+  send_info "<pre>GitHub Action       : GCC build finished ! ! !</pre>"
 }
 
 strip_binaries(){
