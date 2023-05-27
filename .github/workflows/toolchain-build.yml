@@ -1,10 +1,9 @@
-name: GCC+LLD Build
+name: GCC Build
 
 on:
-  push:
-    branches: [ "main" ]
   schedule:
     - cron: '0 6 * * 0,2,4,6'
+  workflow_dispatch:
 
 env:
       GITHUB_EMAIL: ${{ secrets.EMAIL }}
@@ -14,8 +13,8 @@ env:
       CHAT_ID: ${{ secrets.CHAT }}
 
 jobs:
-  build-tc:
-    runs-on: buildjet-64vcpu-ubuntu-2204
+  build:
+    runs-on: ubuntu-latest
     container:
       image: diazaji/debian:gcc
     steps:
