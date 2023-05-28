@@ -8,9 +8,10 @@ echo "* Building Bare-Metal Bleeding Edge GCC *"
 echo "*****************************************"
 
 export WORK_DIR="$PWD"
+export NPROC="$(nproc --all)"
 export PREFIX="${WORK_DIR}/install"
-export PATH="${PREFIX}/bin:/usr/bin/core_perl:${PATH}"
-export OPT_FLAGS="-O3 -pipe -ffunction-sections -fdata-sections"
+export PATH="${PREFIX}/bin:${PATH}"
+export OPT_FLAGS="-O3 -flto=${NPROC} -fipa-pta -pipe -ffunction-sections -fdata-sections"
 export BUILD_DATE="$(date +%Y%m%d)"
 export BUILD_DAY="$(date "+%d %B %Y")"
 mkdir ${PREFIX}
@@ -28,8 +29,8 @@ build_zstd() {
   mkdir ${WORK_DIR}/build-zstd
   pushd ${WORK_DIR}/build-zstd
   cmake ${WORK_DIR}/zstd/build/cmake -DCMAKE_INSTALL_PREFIX:PATH="${PREFIX}"
-  make CFLAGS="-O3" CXXFLAGS="-O3" -j$(nproc --all)
-  make install -j$(nproc --all)
+  make CFLAGS="${OPT_FLAGS}" CXXFLAGS="${OPT_FLAGS}" -j${NPROC}
+  make install -j${NPROC}
   popd
   rm -rf ${WORK_DIR}/build-zstd
   send_info "<pre>GitHub Action       : Zstd build finished ! ! !</pre>"
@@ -59,8 +60,8 @@ build_binutils() {
     --prefix="${PREFIX}" \
     --with-pkgversion='CAT Binutils (=^ェ^=)' \
     --with-sysroot
-  make -j$(nproc --all)
-  make install -j$(nproc --all)
+  make -j${NPROC}
+  make install -j${NPROC}
   popd
   rm -rf ${WORK_DIR}/build-binutils-${ARCH}
   send_info "<pre>GitHub Action       : Binutils build finished ! ! !</pre>"
@@ -107,10 +108,10 @@ build_gcc() {
     --with-zstd="${PREFIX}" \
     --with-zstd-include="${PREFIX}/include" \
     --with-zstd-lib="${PREFIX}/lib"
-  make all-gcc -j$(nproc --all)
-  make all-target-libgcc -j$(nproc --all)
-  make install-gcc -j$(nproc --all)
-  make install-target-libgcc -j$(nproc --all)
+  make all-gcc -j${NPROC}
+  make all-target-libgcc -j${NPROC}
+  make install-gcc -j${NPROC}
+  make install-target-libgcc -j${NPROC}
   popd
   rm -rf ${WORK_DIR}/build-gcc-${ARCH}
   send_info "<pre>GitHub Action       : GCC build finished ! ! !</pre>"
