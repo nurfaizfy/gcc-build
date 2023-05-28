@@ -133,7 +133,7 @@ git_push(){
   cat README | \
     sed s/GCCVERSION/$(echo ${GCC_VERSION}-${BUILD_DATE})/g | \
     sed s/BINUTILSVERSION/$(echo ${BINUTILS_VERSION})/g > README.md
-  git commit -as \
+  git commit --allow-empty -as \
     -m "GCC: ${GCC_VERSION}-${BUILD_DATE}, Binutils: ${BINUTILS_VERSION}" \
     -m "Configuration: $(cat /tmp/gcc-version)"
 
