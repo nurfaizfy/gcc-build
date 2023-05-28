@@ -14,6 +14,7 @@ export PATH="${PREFIX}/bin:${PATH}"
 export OPT_FLAGS="-O3 -flto=${NPROC} -fipa-pta -pipe -ffunction-sections -fdata-sections"
 export BUILD_DATE="$(date +%Y%m%d)"
 export BUILD_DAY="$(date "+%d %B %Y")"
+export BUILD_TAG="$(date +%Y%m%d-%H%M-%Z)"
 mkdir ${PREFIX}
 
 send_info(){
@@ -174,7 +175,7 @@ git_push(){
   rm README*
   tar --use-compress-program='./bin/zstd -12' -cf gcc.tar.zst *
   git push origin main
-  hub release create -a gcc.tar.zst -m "GCC: ${GCC_VERSION}-${BUILD_DATE}, Binutils: ${BINUTILS_VERSION}" ${BUILD_DATE}
+  hub release create -a gcc.tar.zst -m "GCC: ${GCC_VERSION}-${BUILD_DATE}, Binutils: ${BINUTILS_VERSION}" ${BUILD_TAG}
   popd
 }
 
