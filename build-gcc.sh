@@ -17,20 +17,35 @@ export BUILD_DAY="$(date "+%d %B %Y")"
 mkdir ${PREFIX}
 
 send_info(){
-  MESSAGE=$1
   curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
     -d chat_id="${CHAT_ID}" \
     -d "parse_mode=html" \
-    -d text="${MESSAGE}" > /dev/null 2>&1
+    -d text="${1}" > /dev/null 2>&1
+}
+
+send_file(){
+  curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+    -F document=@"${1}" \
+    -F chat_id="${CHAT_ID}" \
+    -F "parse_mode=html" \
+    -F caption="${2}" > /dev/null 2>&1
 }
 
 build_zstd() {
   send_info "<pre>GitHub Action       : Zstd build started . . .</pre>"
   mkdir ${WORK_DIR}/build-zstd
   pushd ${WORK_DIR}/build-zstd
-  cmake ${WORK_DIR}/zstd/build/cmake -DCMAKE_INSTALL_PREFIX:PATH="${PREFIX}"
-  make CFLAGS="${OPT_FLAGS}" CXXFLAGS="${OPT_FLAGS}" -j${NPROC}
-  make install -j${NPROC}
+  cmake ${WORK_DIR}/zstd/build/cmake -DCMAKE_INSTALL_PREFIX:PATH="${PREFIX}" | tee -a build.log
+  make CFLAGS="${OPT_FLAGS}" CXXFLAGS="${OPT_FLAGS}" -j${NPROC} | tee -a build.log
+  make install -j${NPROC} | tee -a build.log
+
+  # check Zstd build status
+  if [ ! -f "${PREFIX}/bin/zstd" ]; then
+    send_info "<pre>GitHub Action       : Zstd build failed ! ! !</pre>"
+    send_file build.log "<pre>GitHub Action       : Zstd build.log</pre>"
+    exit 1
+  fi
+
   popd
   rm -rf ${WORK_DIR}/build-zstd
   send_info "<pre>GitHub Action       : Zstd build finished ! ! !</pre>"
@@ -59,9 +74,17 @@ build_binutils() {
     --enable-gold \
     --prefix="${PREFIX}" \
     --with-pkgversion='CAT Binutils (=^ェ^=)' \
-    --with-sysroot
-  make -j${NPROC}
-  make install -j${NPROC}
+    --with-sysroot | tee -a build.log
+  make -j${NPROC} | tee -a build.log
+  make install -j${NPROC} | tee -a build.log
+
+  # check Binutils build status
+  if [ ! -f "${PREFIX}/bin/${TARGET}-ld" ]; then
+    send_info "<pre>GitHub Action       : Binutils build failed ! ! !</pre>"
+    send_file build.log "<pre>GitHub Action       : Binutils build.log</pre>"
+    exit 1
+  fi
+
   popd
   rm -rf ${WORK_DIR}/build-binutils-${ARCH}
   send_info "<pre>GitHub Action       : Binutils build finished ! ! !</pre>"
@@ -107,11 +130,19 @@ build_gcc() {
     --with-sysroot \
     --with-zstd="${PREFIX}" \
     --with-zstd-include="${PREFIX}/include" \
-    --with-zstd-lib="${PREFIX}/lib"
-  make all-gcc -j${NPROC}
-  make all-target-libgcc -j${NPROC}
-  make install-gcc -j${NPROC}
-  make install-target-libgcc -j${NPROC}
+    --with-zstd-lib="${PREFIX}/lib" | tee -a build.log
+  make all-gcc -j${NPROC} | tee -a build.log
+  make all-target-libgcc -j${NPROC} | tee -a build.log
+  make install-gcc -j${NPROC} | tee -a build.log
+  make install-target-libgcc -j${NPROC} | tee -a build.log
+
+  # check GCC build status
+  if [ ! -f "${PREFIX}/bin/${TARGET}-gcc" ]; then
+    send_info "<pre>GitHub Action       : GCC build failed ! ! !</pre>"
+    send_file build.log "<pre>GitHub Action       : GCC build.log</pre>"
+    exit 1
+  fi
+
   popd
   rm -rf ${WORK_DIR}/build-gcc-${ARCH}
   send_info "<pre>GitHub Action       : GCC build finished ! ! !</pre>"
