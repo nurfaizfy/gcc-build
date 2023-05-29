@@ -19,6 +19,8 @@ jobs:
       image: diazaji/debian:gcc
     steps:
     - uses: actions/checkout@v3
+    - name: Force safe directory
+      run: git config --global --add safe.directory '*'
     - name: Download Resources
       run: ./download-resources.sh
     - name: Build & Release
