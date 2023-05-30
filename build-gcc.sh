@@ -175,7 +175,7 @@ git_push(){
   GCC_CONFIG="$(${PREFIX}/bin/aarch64-elf-gcc -v)"
   GCC_VERSION="$(${PREFIX}/bin/aarch64-elf-gcc --version | head -n1 | cut -d' ' -f5)"
   BINUTILS_VERSION="$(${PREFIX}/bin/aarch64-elf-ld --version | head -n1 | cut -d' ' -f6)"
-  MESSAGE="$(GCC: ${GCC_VERSION}-${BUILD_DATE}, Binutils: ${BINUTILS_VERSION})"
+  MESSAGE="GCC: ${GCC_VERSION}-${BUILD_DATE}, Binutils: ${BINUTILS_VERSION}"
   git config --global user.name "${GITHUB_USER}"
   git config --global user.email "${GITHUB_EMAIL}"
   git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_USER}"/gcc ${WORK_DIR}/gcc-repo -b main
