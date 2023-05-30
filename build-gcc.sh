@@ -69,6 +69,7 @@ build_binutils() {
     --disable-werror \
     --enable-gold \
     --prefix="${PREFIX}" \
+    --quiet \
     --with-pkgversion='CAT Binutils (=^ェ^=)' \
     --with-sysroot | tee -a build.log
   make -j${NPROC} | tee -a build.log
@@ -108,6 +109,7 @@ build_gcc() {
     --enable-languages=c,c++ \
     --enable-threads=posix \
     --prefix="${PREFIX}" \
+    --quiet \
     --with-gnu-as \
     --with-gnu-ld \
     --with-headers="/usr/include" \
