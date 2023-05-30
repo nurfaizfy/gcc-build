@@ -16,7 +16,9 @@ export BUILD_DATE="$(date +%Y%m%d)"
 export BUILD_DAY="$(date "+%d %B %Y")"
 export BUILD_TAG="$(date +%Y%m%d-%H%M-%Z)"
 export TARGETS="x86_64-elf aarch64-elf"
-export TRIGGER="$(git log --oneline -1)"
+export HEAD_SCRIPT="$(git log -1 --oneline)"
+export HEAD_GCC="$(git --git-dir gcc/.git log -1 --oneline)"
+export HEAD_BINUTILS="$(git --git-dir binutils/.git log -1 --oneline)"
 
 send_info(){
   curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
@@ -191,7 +193,13 @@ git_push(){
   popd
 }
 
-send_info "<pre>Date                : ${BUILD_DAY}</pre><pre>GitHub Action       : Toolchain compilation started . . .</pre><pre>Commit              : ${TRIGGER}</pre>"
+send_info "
+<pre>Date                : ${BUILD_DAY}</pre>
+<pre>GitHub Action       : Toolchain compilation started . . .</pre>
+
+<pre>Script    ${HEAD_SCRIPT}</pre>
+<pre>GCC       ${HEAD_GCC}</pre>
+<pre>Binutils  ${HEAD_BINUTILS}</pre>"
 build_zstd
 for TARGET in ${TARGETS}; do
   build_binutils
