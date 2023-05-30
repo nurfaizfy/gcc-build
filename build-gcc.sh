@@ -12,6 +12,7 @@ export NPROC="$(nproc --all)"
 export PREFIX="${WORK_DIR}/install"
 export PATH="${PREFIX}/bin:${PATH}"
 export OPT_CFLAGS="-O3 -flto=${NPROC} -fipa-pta -pipe -ffunction-sections -fdata-sections -fgraphite -fgraphite-identity -floop-nest-optimize"
+export OPT_LDFLAGS="-S"
 export BUILD_DATE="$(date +%Y%m%d)"
 export BUILD_DAY="$(date "+%d %B %Y")"
 export BUILD_TAG="$(date +%Y%m%d-%H%M-%Z)"
@@ -39,8 +40,9 @@ build_zstd() {
   send_info "<pre>GitHub Action       : Zstd build started . . .</pre>"
   mkdir ${WORK_DIR}/build-zstd
   pushd ${WORK_DIR}/build-zstd
-  cmake ${WORK_DIR}/zstd/build/cmake -DCMAKE_INSTALL_PREFIX:PATH="${PREFIX}" | tee -a build.log
-  make CFLAGS="${OPT_CFLAGS}" CXXFLAGS="${OPT_CFLAGS}" -j${NPROC} | tee -a build.log
+  env CFLAGS="${OPT_CFLAGS}" CXXFLAGS="${OPT_CFLAGS}" LDFLAGS="${OPT_LDFLAGS}" \
+    cmake ${WORK_DIR}/zstd/build/cmake -DCMAKE_INSTALL_PREFIX:PATH="${PREFIX}" | tee -a build.log
+  make -j${NPROC} | tee -a build.log
   make install -j${NPROC} | tee -a build.log
 
   # check Zstd build status
@@ -60,7 +62,7 @@ build_binutils() {
   send_info "<pre>GitHub Action       : Binutils build started . . .</pre><pre>Target              : [${TARGET}]</pre>"
   mkdir ${WORK_DIR}/build-binutils
   pushd ${WORK_DIR}/build-binutils
-  env CFLAGS="${OPT_CFLAGS}" CXXFLAGS="${OPT_CFLAGS}" \
+  env CFLAGS="${OPT_CFLAGS}" CXXFLAGS="${OPT_CFLAGS}" LDFLAGS="${OPT_LDFLAGS}" \
     ../binutils/configure \
     --target=${TARGET} \
     --disable-docs \
@@ -92,7 +94,7 @@ build_gcc() {
   send_info "<pre>GitHub Action       : GCC build started . . .</pre><pre>Target              : [${TARGET}]</pre>"
   mkdir ${WORK_DIR}/build-gcc
   pushd ${WORK_DIR}/build-gcc
-  env CFLAGS="${OPT_CFLAGS}" CXXFLAGS="${OPT_CFLAGS}" \
+  env CFLAGS="${OPT_CFLAGS}" CXXFLAGS="${OPT_CFLAGS}" LDFLAGS="${OPT_LDFLAGS}" \
     ../gcc/configure \
     --target=${TARGET} \
     --disable-decimal-float \
