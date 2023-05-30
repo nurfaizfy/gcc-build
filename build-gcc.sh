@@ -143,9 +143,9 @@ strip_binaries(){
 
   find install -type f -exec file {} \; > .file-idx
 
-  cp ${PREFIX}/bin/x86_64-elf-strip ./stripp-x86
-  cp ${PREFIX}/bin/aarch64-elf-strip ./stripp-a64
-  cp ${PREFIX}/bin/arm-eabi-strip ./stripp-a32
+  cp -rf ${PREFIX}/bin/x86_64-elf-strip ./stripp-x86 || true
+  cp -rf ${PREFIX}/bin/aarch64-elf-strip ./stripp-a64 || true
+  cp -rf ${PREFIX}/bin/arm-eabi-strip ./stripp-a32 || true
 
   grep "x86-64" .file-idx |
     grep "not strip" |
