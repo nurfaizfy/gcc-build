@@ -68,8 +68,7 @@ build_binutils() {
     --disable-docs \
     --disable-gdb \
     --disable-nls \
-    --disable-werror \
-    --enable-gold \
+    --disable-shared \
     --prefix="${PREFIX}" \
     --quiet \
     --with-pkgversion='CAT Binutils (=^ェ^=)' \
@@ -102,7 +101,6 @@ build_gcc() {
     --disable-gcov \
     --disable-libffi \
     --disable-libgomp \
-    --disable-libmudflap \
     --disable-libquadmath \
     --disable-libstdcxx-pch \
     --disable-nls \
