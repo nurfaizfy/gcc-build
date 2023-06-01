@@ -70,7 +70,7 @@ build_binutils() {
     --disable-shared \
     --prefix="${PREFIX}" \
     --quiet \
-    --with-pkgversion='CAT Binutils (=^ェ^=)' \
+    --with-pkgversion='CAT (=^ェ^=) Binutils' \
     --with-sysroot | tee -a build.log
   make -j${NPROC} | tee -a build.log
   make install -j${NPROC} | tee -a build.log
@@ -114,7 +114,7 @@ build_gcc() {
     --with-headers="/usr/include" \
     --with-linker-hash-style=gnu \
     --with-newlib \
-    --with-pkgversion='CAT GCC (=^ェ^=)' \
+    --with-pkgversion='CAT (=^ェ^=) GCC' \
     --with-sysroot \
     --with-zstd="${PREFIX}" \
     --with-zstd-include="${PREFIX}/include" \
