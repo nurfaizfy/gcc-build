@@ -160,11 +160,7 @@ strip_binaries(){
     while read -r file; do ./stripp-a32 -s "$file"; done
 
   # clean unused files
-  rm -rf stripp-* .file-idx \
-    ${INSTALL}/include \
-    ${INSTALL}/lib/cmake \
-    ${INSTALL}/lib/*.a \
-    ${INSTALL}/lib/*.la
+  rm -rf stripp-* .file-idx
 }
 
 git_push(){
