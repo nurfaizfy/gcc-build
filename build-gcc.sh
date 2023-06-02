@@ -195,7 +195,7 @@ send_info "
 <pre>Script    ${HEAD_SCRIPT}</pre>
 <pre>GCC       ${HEAD_GCC}</pre>
 <pre>Binutils  ${HEAD_BINUTILS}</pre>"
-#build_zstd
+build_zstd
 for TARGET in ${TARGETS}; do
   build_binutils
   build_gcc
