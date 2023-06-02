@@ -113,10 +113,10 @@ build_gcc() {
     --with-linker-hash-style=gnu \
     --with-newlib \
     --with-pkgversion='CAT (=^ェ^=) GCC' \
-    --with-sysroot \
-    --with-zstd="${PREFIX}" \
-    --with-zstd-include="${PREFIX}/include" \
-    --with-zstd-lib="${PREFIX}/lib" | tee -a build.log
+    --with-sysroot
+#    --with-zstd="${PREFIX}" \
+#    --with-zstd-include="${PREFIX}/include" \
+#    --with-zstd-lib="${PREFIX}/lib" | tee -a build.log
   make all-gcc -j${NPROC} | tee -a build.log
   make all-target-libgcc -j${NPROC} | tee -a build.log
   make install-gcc -j${NPROC} | tee -a build.log
@@ -199,7 +199,7 @@ send_info "
 <pre>Script    ${HEAD_SCRIPT}</pre>
 <pre>GCC       ${HEAD_GCC}</pre>
 <pre>Binutils  ${HEAD_BINUTILS}</pre>"
-build_zstd
+#build_zstd
 for TARGET in ${TARGETS}; do
   build_binutils
   build_gcc
