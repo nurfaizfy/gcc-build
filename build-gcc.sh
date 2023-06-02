@@ -97,7 +97,6 @@ build_gcc() {
     --target=${TARGET} \
     --disable-decimal-float \
     --disable-docs \
-    --disable-gcov \
     --disable-libffi \
     --disable-libgomp \
     --disable-libquadmath \
