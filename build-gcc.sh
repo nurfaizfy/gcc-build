@@ -105,7 +105,6 @@ build_gcc() {
     --disable-shared \
     --enable-default-ssp \
     --enable-languages=c,c++ \
-    --enable-threads=posix \
     --prefix="${PREFIX}" \
     --quiet \
     --with-gnu-as \
