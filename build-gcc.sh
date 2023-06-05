@@ -60,7 +60,7 @@ build_zstd() {
 build_binutils() {
   pushd ${WORK_DIR}/binutils
   if [ "$1" == "master" ]; then
-    PROG_PREFIX="${TARGET}"
+    PROG_PREFIX="${TARGET}-"
     git checkout -f origin/master
     send_info "<pre>GitHub Action       : Binutils build started . . .</pre>
 <pre>Target              : [${TARGET}]</pre>
@@ -107,7 +107,7 @@ build_binutils() {
 build_gcc() {
   pushd ${WORK_DIR}/gcc
   if [ "$1" == "master" ]; then
-    PROG_PREFIX="${TARGET}"
+    PROG_PREFIX="${TARGET}-"
     git checkout -f origin/master
     send_info "<pre>GitHub Action       : GCC build started . . .</pre>
 <pre>Target              : [${TARGET}]</pre>
@@ -195,7 +195,7 @@ strip_binaries(){
 
 git_push(){
   send_info "<pre>GitHub Action       : Release into GitHub . . .</pre>"
-  GCC_CONFIG="$(${PREFIX}/bin/aarch64-elf-gcc -v)"
+  GCC_CONFIG="$(${PREFIX}/bin/aarch64-elf-rel-gcc -v)"
   GCC_VER_REL="$(${PREFIX}/bin/aarch64-elf-rel-gcc --version | head -n1 | cut -d' ' -f5)"
   GCC_VER="$(${PREFIX}/bin/aarch64-elf-gcc --version | head -n1 | cut -d' ' -f5)/${GCC_VER_REL}"
   BINUTILS_VER_REL="$(${PREFIX}/bin/aarch64-elf-rel-ld --version | head -n1 | cut -d' ' -f6)"
@@ -209,9 +209,9 @@ git_push(){
   pushd ${WORK_DIR}/gcc-repo
   cp -rf ${PREFIX}/* .
   tar -I"${PREFIX}/bin/zstd -12" -cf gcc.tar.zst *
-  cat README | \
-    sed s/GCCVERSION/$(echo ${GCC_VER}-${BUILD_DATE})/g | \
-    sed s/BINUTILSVERSION/$(echo ${BINUTILS_VER})/g > README.md
+  cat README |
+    sed s:GCCVERSION:$(echo ${GCC_VER}-${BUILD_DATE}):g |
+    sed s:BINUTILSVERSION:$(echo ${BINUTILS_VER}):g > README.md
   git commit --allow-empty -as \
     -m "${MESSAGE}" \
     -m "${GCC_CONFIG}"
