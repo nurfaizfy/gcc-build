@@ -58,7 +58,22 @@ build_zstd() {
 }
 
 build_binutils() {
-  send_info "<pre>GitHub Action       : Binutils build started . . .</pre><pre>Target              : [${TARGET}]</pre>"
+  pushd ${WORK_DIR}/binutils
+  if [ "$1" == "master" ]; then
+    PROG_PREFIX="${TARGET}"
+    git checkout -f origin/master
+    send_info "<pre>GitHub Action       : Binutils build started . . .</pre>
+<pre>Target              : [${TARGET}]</pre>
+<pre>Branch              : master"
+  else
+    PROG_PREFIX="${TARGET}-rel-"
+    git checkout -f origin/$1
+    send_info "<pre>GitHub Action       : Binutils build started . . .</pre>
+<pre>Target              : [${TARGET}]</pre>
+<pre>Branch              : $1"
+  fi
+  popd
+  sed -i '/^development=/s/true/false/' binutils/bfd/development.sh
   mkdir ${WORK_DIR}/build-binutils
   pushd ${WORK_DIR}/build-binutils
   env CFLAGS="${OPT_FLAGS}" CXXFLAGS="${OPT_FLAGS}" \
@@ -69,6 +84,7 @@ build_binutils() {
     --disable-nls \
     --disable-shared \
     --prefix="${PREFIX}" \
+    --program-prefix="${PROG_PREFIX}" \
     --quiet \
     --with-pkgversion='CAT (=^ェ^=) Binutils' \
     --with-sysroot | tee -a build.log
@@ -76,7 +92,7 @@ build_binutils() {
   make install -j${NPROC} | tee -a build.log
 
   # check Binutils build status
-  if [ -f "${PREFIX}/bin/${TARGET}-ld" ]; then
+  if [ -f "${PREFIX}/bin/${PROG_PREFIX}ld" ]; then
     rm -rf ${WORK_DIR}/build-binutils
     send_info "<pre>GitHub Action       : Binutils build finished ! ! !</pre>"
     popd
@@ -89,7 +105,21 @@ build_binutils() {
 }
 
 build_gcc() {
-  send_info "<pre>GitHub Action       : GCC build started . . .</pre><pre>Target              : [${TARGET}]</pre>"
+  pushd ${WORK_DIR}/gcc
+  if [ "$1" == "master" ]; then
+    PROG_PREFIX="${TARGET}"
+    git checkout -f origin/master
+    send_info "<pre>GitHub Action       : GCC build started . . .</pre>
+<pre>Target              : [${TARGET}]</pre>
+<pre>Branch              : master"
+  else
+    PROG_PREFIX="${TARGET}-rel-"
+    git checkout -f origin/$1
+    send_info "<pre>GitHub Action       : GCC build started . . .</pre>
+<pre>Target              : [${TARGET}]</pre>
+<pre>Branch              : $1"
+  fi
+  popd
   mkdir ${WORK_DIR}/build-gcc
   pushd ${WORK_DIR}/build-gcc
   env CFLAGS="${OPT_FLAGS}" CXXFLAGS="${OPT_FLAGS}" \
@@ -106,6 +136,7 @@ build_gcc() {
     --enable-default-ssp \
     --enable-languages=c,c++ \
     --prefix="${PREFIX}" \
+    --program-prefix="${PROG_PREFIX}" \
     --quiet \
     --with-gnu-as \
     --with-gnu-ld \
@@ -123,7 +154,7 @@ build_gcc() {
   make install-target-libgcc -j${NPROC} | tee -a build.log
 
   # check GCC build status
-  if [ -f "${PREFIX}/bin/${TARGET}-gcc" ]; then
+  if [ -f "${PREFIX}/bin/${PROG_PREFIX}gcc" ]; then
     rm -rf ${WORK_DIR}/build-gcc
     send_info "<pre>GitHub Action       : GCC build finished ! ! !</pre>"
     popd
@@ -140,9 +171,9 @@ strip_binaries(){
 
   find install -type f -exec file {} \; > .file-idx
 
-  cp -rf ${PREFIX}/bin/x86_64-elf-strip ./stripp-x86 || true
-  cp -rf ${PREFIX}/bin/aarch64-elf-strip ./stripp-a64 || true
-  cp -rf ${PREFIX}/bin/arm-eabi-strip ./stripp-a32 || true
+  cp -rf ${PREFIX}/bin/x86_64-elf-rel-strip ./stripp-x86 || true
+  cp -rf ${PREFIX}/bin/aarch64-elf-rel-strip ./stripp-a64 || true
+  cp -rf ${PREFIX}/bin/arm-eabi-rel-strip ./stripp-a32 || true
 
   grep "x86-64" .file-idx |
     grep "not strip" |
@@ -159,16 +190,17 @@ strip_binaries(){
     tr ':' ' ' | awk '{print $1}' |
     while read -r file; do ./stripp-a32 -s "$file"; done
 
-  # clean unused files
   rm -rf stripp-* .file-idx
 }
 
 git_push(){
   send_info "<pre>GitHub Action       : Release into GitHub . . .</pre>"
   GCC_CONFIG="$(${PREFIX}/bin/aarch64-elf-gcc -v)"
-  GCC_VERSION="$(${PREFIX}/bin/aarch64-elf-gcc --version | head -n1 | cut -d' ' -f5)"
-  BINUTILS_VERSION="$(${PREFIX}/bin/aarch64-elf-ld --version | head -n1 | cut -d' ' -f6)"
-  MESSAGE="GCC: ${GCC_VERSION}-${BUILD_DATE}, Binutils: ${BINUTILS_VERSION}"
+  GCC_VER_REL="$(${PREFIX}/bin/aarch64-elf-rel-gcc --version | head -n1 | cut -d' ' -f5)"
+  GCC_VER="$(${PREFIX}/bin/aarch64-elf-gcc --version | head -n1 | cut -d' ' -f5)/${GCC_VER_REL}"
+  BINUTILS_VER_REL="$(${PREFIX}/bin/aarch64-elf-rel-ld --version | head -n1 | cut -d' ' -f6)"
+  BINUTILS_VER="$(${PREFIX}/bin/aarch64-elf-rel-ld --version | head -n1 | cut -d' ' -f6)/${BINUTILS_VER_REL}"
+  MESSAGE="${BUILD_DATE} GCC: ${GCC_VER}, Binutils: ${BINUTILS_VER}"
   git config --global user.name "${GITHUB_USER}"
   git config --global user.email "${GITHUB_EMAIL}"
   git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_USER}"/gcc ${WORK_DIR}/gcc-repo -b main
@@ -178,8 +210,8 @@ git_push(){
   cp -rf ${PREFIX}/* .
   tar -I"${PREFIX}/bin/zstd -12" -cf gcc.tar.zst *
   cat README | \
-    sed s/GCCVERSION/$(echo ${GCC_VERSION}-${BUILD_DATE})/g | \
-    sed s/BINUTILSVERSION/$(echo ${BINUTILS_VERSION})/g > README.md
+    sed s/GCCVERSION/$(echo ${GCC_VER}-${BUILD_DATE})/g | \
+    sed s/BINUTILSVERSION/$(echo ${BINUTILS_VER})/g > README.md
   git commit --allow-empty -as \
     -m "${MESSAGE}" \
     -m "${GCC_CONFIG}"
@@ -197,8 +229,10 @@ send_info "
 <pre>Binutils  ${HEAD_BINUTILS}</pre>"
 build_zstd
 for TARGET in ${TARGETS}; do
-  build_binutils
-  build_gcc
+  build_binutils $2
+  build_binutils master
+  build_gcc $1
+  build_gcc master
 done
 strip_binaries
 git_push
