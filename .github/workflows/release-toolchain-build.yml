@@ -1,0 +1,25 @@
+name: Release GCC Build
+
+on:
+  workflow_dispatch:
+
+env:
+  GITHUB_EMAIL: ${{ secrets.EMAIL }}
+  GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
+  GITHUB_USER: ${{ secrets.USERNAME }}
+  BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  CHAT_ID: ${{ secrets.CHAT }}
+
+jobs:
+  build:
+    runs-on: buildjet-32vcpu-ubuntu-2204
+    container:
+      image: diazaji/debian:gcc
+    steps:
+    - uses: actions/checkout@v3
+    - name: Force safe directory
+      run: git config --global --add safe.directory '*'
+    - name: Download Resources
+      run: ./download-resources.sh
+    - name: Build & Release
+      run: ./build-gcc.sh
