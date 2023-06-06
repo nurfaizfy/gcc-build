@@ -19,6 +19,7 @@ export TARGETS="x86_64-elf aarch64-elf"
 export HEAD_SCRIPT="$(git log -1 --oneline)"
 export HEAD_GCC="$(git --git-dir gcc/.git log -1 --oneline)"
 export HEAD_BINUTILS="$(git --git-dir binutils/.git log -1 --oneline)"
+export IS_MASTER="${1}"
 
 send_info(){
   curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
@@ -36,21 +37,21 @@ send_file(){
 }
 
 build_zstd() {
-  send_info "<pre>GitHub Action       : Zstd build started . . .</pre>"
+#  send_info "<b>GitHub Action : </b><pre>Zstd build started . . .</pre>"
   mkdir ${WORK_DIR}/build-zstd
   pushd ${WORK_DIR}/build-zstd
   env CFLAGS="${OPT_FLAGS}" CXXFLAGS="${OPT_FLAGS}" \
-    cmake ${WORK_DIR}/zstd/build/cmake -DCMAKE_INSTALL_PREFIX:PATH="${PREFIX}" | tee -a build.log
-  make -j${NPROC} | tee -a build.log
-  make install -j${NPROC} | tee -a build.log
+    cmake ${WORK_DIR}/zstd/build/cmake -DCMAKE_INSTALL_PREFIX:PATH="${PREFIX}" |& tee -a build.log
+  make -j${NPROC} |& tee -a build.log
+  make install -j${NPROC} |& tee -a build.log
 
   # check Zstd build status
   if [ -f "${PREFIX}/bin/zstd" ]; then
     rm -rf ${WORK_DIR}/build-zstd
-    send_info "<pre>GitHub Action       : Zstd build finished ! ! !</pre>"
+#    send_info "<b>GitHub Action : </b><pre>Zstd build finished ! ! !</pre>"
     popd
   else
-    send_info "<pre>GitHub Action       : Zstd build failed ! ! !</pre>"
+    send_info "<b>GitHub Action : </b><pre>Zstd build failed ! ! !</pre>"
     send_file ./build.log "Zstd build.log"
     popd
     exit 1
@@ -58,7 +59,7 @@ build_zstd() {
 }
 
 build_binutils() {
-  send_info "<pre>GitHub Action       : Binutils build started . . .</pre><pre>Target              : [${TARGET}]</pre>"
+#  send_info "<b>GitHub Action : </b><pre>Binutils build started . . .</pre><b>Target : </b><pre>[${TARGET}]</pre>"
   mkdir ${WORK_DIR}/build-binutils
   pushd ${WORK_DIR}/build-binutils
   env CFLAGS="${OPT_FLAGS}" CXXFLAGS="${OPT_FLAGS}" \
@@ -71,17 +72,17 @@ build_binutils() {
     --prefix="${PREFIX}" \
     --quiet \
     --with-pkgversion='CAT (=^ェ^=) Binutils' \
-    --with-sysroot | tee -a build.log
-  make -j${NPROC} | tee -a build.log
-  make install -j${NPROC} | tee -a build.log
+    --with-sysroot |& tee -a build.log
+  make -j${NPROC} |& tee -a build.log
+  make install -j${NPROC} |& tee -a build.log
 
   # check Binutils build status
   if [ -f "${PREFIX}/bin/${TARGET}-ld" ]; then
     rm -rf ${WORK_DIR}/build-binutils
-    send_info "<pre>GitHub Action       : Binutils build finished ! ! !</pre>"
+#    send_info "<b>GitHub Action : </b><pre>Binutils build finished ! ! !</pre>"
     popd
   else
-    send_info "<pre>GitHub Action       : Binutils build failed ! ! !</pre>"
+    send_info "<b>GitHub Action : </b><pre>Binutils build failed ! ! !</pre>"
     send_file ./build.log "Binutils build.log"
     popd
     exit 1
@@ -89,7 +90,7 @@ build_binutils() {
 }
 
 build_gcc() {
-  send_info "<pre>GitHub Action       : GCC build started . . .</pre><pre>Target              : [${TARGET}]</pre>"
+#  send_info "<b>GitHub Action : </b><pre>GCC build started . . .</pre><b>Target : </b><pre>[${TARGET}]</pre>"
   mkdir ${WORK_DIR}/build-gcc
   pushd ${WORK_DIR}/build-gcc
   env CFLAGS="${OPT_FLAGS}" CXXFLAGS="${OPT_FLAGS}" \
@@ -116,19 +117,19 @@ build_gcc() {
     --with-sysroot
 #    --with-zstd="${PREFIX}" \
 #    --with-zstd-include="${PREFIX}/include" \
-#    --with-zstd-lib="${PREFIX}/lib" | tee -a build.log
-  make all-gcc -j${NPROC} | tee -a build.log
-  make all-target-libgcc -j${NPROC} | tee -a build.log
-  make install-gcc -j${NPROC} | tee -a build.log
-  make install-target-libgcc -j${NPROC} | tee -a build.log
+#    --with-zstd-lib="${PREFIX}/lib" |& tee -a build.log
+  make all-gcc -j${NPROC} |& tee -a build.log
+  make all-target-libgcc -j${NPROC} |& tee -a build.log
+  make install-gcc -j${NPROC} |& tee -a build.log
+  make install-target-libgcc -j${NPROC} |& tee -a build.log
 
   # check GCC build status
   if [ -f "${PREFIX}/bin/${TARGET}-gcc" ]; then
     rm -rf ${WORK_DIR}/build-gcc
-    send_info "<pre>GitHub Action       : GCC build finished ! ! !</pre>"
+#    send_info "<b>GitHub Action : </b><pre>GCC build finished ! ! !</pre>"
     popd
   else
-    send_info "<pre>GitHub Action       : GCC build failed ! ! !</pre>"
+    send_info "<b>GitHub Action : </b><pre>GCC build failed ! ! !</pre>"
     send_file ./build.log "GCC build.log"
     popd
     exit 1
@@ -136,7 +137,7 @@ build_gcc() {
 }
 
 strip_binaries(){
-  send_info "<pre>GitHub Action       : Strip binaries . . .</pre>"
+#  send_info "<b>GitHub Action : </b><pre>Strip binaries . . .</pre>"
 
   find install -type f -exec file {} \; > .file-idx
 
@@ -164,15 +165,18 @@ strip_binaries(){
 }
 
 git_push(){
-  send_info "<pre>GitHub Action       : Release into GitHub . . .</pre>"
+  send_info "<b>GitHub Action : </b><pre>Release into GitHub . . .</pre>"
   GCC_CONFIG="$(${PREFIX}/bin/aarch64-elf-gcc -v)"
   GCC_VERSION="$(${PREFIX}/bin/aarch64-elf-gcc --version | head -n1 | cut -d' ' -f5)"
   BINUTILS_VERSION="$(${PREFIX}/bin/aarch64-elf-ld --version | head -n1 | cut -d' ' -f6)"
   MESSAGE="GCC: ${GCC_VERSION}-${BUILD_DATE}, Binutils: ${BINUTILS_VERSION}"
   git config --global user.name "${GITHUB_USER}"
   git config --global user.email "${GITHUB_EMAIL}"
-  git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_USER}"/gcc ${WORK_DIR}/gcc-repo -b main
-
+  if [ "${IS_MASTER}" == "master" ]; then
+    git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_USER}"/gcc ${WORK_DIR}/gcc-repo -b main
+  else
+    git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_USER}"/gcc-stable ${WORK_DIR}/gcc-repo -b main
+  fi
   # Generate archive
   pushd ${WORK_DIR}/gcc-repo
   cp -rf ${PREFIX}/* .
@@ -189,12 +193,12 @@ git_push(){
 }
 
 send_info "
-<pre>Date                : ${BUILD_DAY}</pre>
-<pre>GitHub Action       : Toolchain compilation started . . .</pre>
+<b>Date : </b><pre>${BUILD_DAY}</pre>
+<b>GitHub Action : </b><pre>Toolchain compilation started . . .</pre>
 
-<pre>Script    ${HEAD_SCRIPT}</pre>
-<pre>GCC       ${HEAD_GCC}</pre>
-<pre>Binutils  ${HEAD_BINUTILS}</pre>"
+<b>Script </b><pre>${HEAD_SCRIPT}</pre>
+<b>GCC </b><pre>${HEAD_GCC}</pre>
+<b>Binutils </b><pre>${HEAD_BINUTILS}</pre>"
 build_zstd
 for TARGET in ${TARGETS}; do
   build_binutils
@@ -202,4 +206,4 @@ for TARGET in ${TARGETS}; do
 done
 strip_binaries
 git_push
-send_info "<pre>GitHub Action       : All job finished ! ! !</pre>"
+send_info "<b>GitHub Action : </b><pre>All job finished ! ! !</pre>"

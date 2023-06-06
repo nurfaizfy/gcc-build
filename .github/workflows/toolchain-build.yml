@@ -1,4 +1,4 @@
-name: GCC Build
+name: Bleeding Edge GCC Build
 
 on:
   schedule:
@@ -6,11 +6,11 @@ on:
   workflow_dispatch:
 
 env:
-      GITHUB_EMAIL: ${{ secrets.EMAIL }}
-      GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
-      GITHUB_USER: ${{ secrets.USERNAME }}
-      BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      CHAT_ID: ${{ secrets.CHAT }}
+  GITHUB_EMAIL: ${{ secrets.EMAIL }}
+  GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
+  GITHUB_USER: ${{ secrets.USERNAME }}
+  BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  CHAT_ID: ${{ secrets.CHAT }}
 
 jobs:
   build:
@@ -22,6 +22,6 @@ jobs:
     - name: Force safe directory
       run: git config --global --add safe.directory '*'
     - name: Download Resources
-      run: ./download-resources.sh
+      run: ./download-resources.sh master
     - name: Build & Release
-      run: ./build-gcc.sh
+      run: ./build-gcc.sh master

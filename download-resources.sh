@@ -4,17 +4,22 @@ echo "*****************************************"
 echo "*        Download GCC & Binutils        *"
 echo "*****************************************"
 
+export IS_MASTER="${1}"
+
 download() {
-  echo "Cloning Binutils"
-  git clone git://sourceware.org/git/binutils-gdb.git -b master binutils --depth=1
+  if [ "${IS_MASTER}" == "master" ]; then
+    git clone -b master --depth=1 git://sourceware.org/git/binutils-gdb.git binutils
+    git clone -b master --depth=1 git://gcc.gnu.org/git/gcc.git gcc
+    git clone -b dev https://github.com/facebook/zstd zstd
+  else
+    git clone -b binutils-2_40-branch --depth=1 git://sourceware.org/git/binutils-gdb.git binutils
+    git clone -b releases/gcc-13 --depth=1 git://gcc.gnu.org/git/gcc.git gcc
+    git clone -b v1.5.5 https://github.com/facebook/zstd zstd
+  fi
   sed -i '/^development=/s/true/false/' binutils/bfd/development.sh
-  echo "Cloning GCC"
-  git clone git://gcc.gnu.org/git/gcc.git -b master gcc --depth=1
   cd gcc
   ./contrib/download_prerequisites
   cd ..
-  echo "Cloning Zstd"
-  git clone https://github.com/facebook/zstd -b v1.5.5 zstd --depth=1
 }
 
 download
