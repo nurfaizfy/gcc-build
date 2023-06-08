@@ -181,9 +181,9 @@ git_push(){
   # Generate archive
   pushd ${WORK_DIR}/gcc-repo
   cp -rf ${PREFIX}/* .
-  tar -I"${PREFIX}/bin/zstd -12" -cf gcc.tar.zst *
-  cat README | \
-    sed s/GCCVERSION/$(echo ${GCC_VERSION}-${BUILD_DATE})/g | \
+  tar -I"${PREFIX}/bin/zstd --ultra -22" -cf gcc.tar.zst *
+  cat README |
+    sed s/GCCVERSION/$(echo ${GCC_VERSION}-${BUILD_DATE})/g |
     sed s/BINUTILSVERSION/$(echo ${BINUTILS_VERSION})/g > README.md
   git commit --allow-empty -as \
     -m "${MESSAGE}" \
