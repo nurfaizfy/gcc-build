@@ -69,6 +69,7 @@ build_binutils() {
     --disable-gdb \
     --disable-nls \
     --disable-shared \
+    --enable-gold \
     --prefix="${PREFIX}" \
     --quiet \
     --with-pkgversion='CAT (=^ェ^=) Binutils' \
