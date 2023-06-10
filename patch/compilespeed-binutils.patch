@@ -1,0 +1,49 @@
+diff --git a/gas/as.c b/gas/as.c
+index 6839c841..8dcba048 100644
+--- a/gas/as.c
++++ b/gas/as.c
+@@ -1255,13 +1255,6 @@ gas_early_init (int *argcp, char ***argvp)
+   start_time = get_run_time ();
+   signal_init ();
+ 
+-#ifdef HAVE_LC_MESSAGES
+-  setlocale (LC_MESSAGES, "");
+-#endif
+-  setlocale (LC_CTYPE, "");
+-  bindtextdomain (PACKAGE, LOCALEDIR);
+-  textdomain (PACKAGE);
+-
+   if (debug_memory)
+     chunksize = 64;
+ 
+diff --git a/gas/input-file.c b/gas/input-file.c
+index 4babd4bd..faae8e7d 100644
+--- a/gas/input-file.c
++++ b/gas/input-file.c
+@@ -125,7 +125,7 @@ input_file_open (const char *filename,
+   gas_assert (filename != 0);  /* Filename may not be NULL.  */
+   if (filename[0])
+     {
+-      f_in = fopen (filename, FOPEN_RT);
++      f_in = fopen (filename, "rm");
+       file_name = filename;
+     }
+   else
+@@ -202,6 +202,8 @@ input_file_open (const char *filename,
+ void
+ input_file_close (void)
+ {
++  /* For performance, just leak the FD, we exit instantly anyway */
++  return;
+   /* Don't close a null file pointer.  */
+   if (f_in != NULL)
+     fclose (f_in);
+@@ -248,8 +250,6 @@ input_file_give_next_buffer (char *where /* Where to place 1st character of new
+     return_value = where + size;
+   else
+     {
+-      if (fclose (f_in))
+-       as_warn (_("can't close %s: %s"), file_name, xstrerror (errno));
+ 
+       f_in = (FILE *) 0;
+       return_value = 0;
