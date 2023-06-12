@@ -1,7 +1,5 @@
 # GCC Cross Compiler Toolchain Build Script
 
-![ARM GCC Build](https://github.com/mvaisakh/gcc-build/workflows/ARM%20GCC%20Build/badge.svg) ![ARM64 GCC Build](https://github.com/mvaisakh/gcc-build/workflows/ARM64%20GCC%20Build/badge.svg) 
-
 This repository contains the script needed to compile bare metal GCC for various architectures using Linux distributions. The GCC source is fetched from the master branch hence, contains all the bleeding edge changes.
 
 ## Before we start
@@ -37,27 +35,22 @@ This repository contains the script needed to compile bare metal GCC for various
 
 Running this script is quite simple. We start by cloning this repository:
 ```bash
-git clone https://github.com/mvaisakh/gcc-build.git gcc-build
+git clone https://github.com/Diaz1401/gcc-build.git gcc-build
 ```
 ```bash
-./build-gcc.sh -a <architechture>
+./build.sh <branch>
 ```
-> As of now, I only support **arm**, **arm64** and **x86 (compiles for x86_64 only)**. This list is subject to change as I receive requests.
-
-> Keep in mind that this script contains just the bare minimum prerequisites.
 
 ## Credits
 
-* [Vaisakh (me)](https://github.com/mvaisakh/) for writing this script.
+* [Vaisakh](https://github.com/mvaisakh/) for writing this script.
 * [OS Dev Wiki](https://wiki.osdev.org) for knowledge base.
 * [USBHost's Amazing GCC Build script](https://github.com/USBhost/build-tools-gcc) for certain prerequisite dependencies.
 
 ## Looking for precompiled toolchains?
 
-My GCC Cross Compiler builds are automated and pushed biweekly i.e. on Sundays & Thursdays at 00:00 GMT+5:30 (IST). They are pushed to:
-* **[ARM64](https://github.com/mvaisakh/gcc-arm64)**
-* **[ARM32](https://github.com/mvaisakh/gcc-arm)**
-* **[X86_64](https://github.com/mvaisakh/gcc-x86)** (Not built on cron anymore)
+* **[Bleeding Edge](https://github.com/Diaz1401/gcc)**
+* **[Release](https://github.com/Diaz1401/gcc-stable)**
 
 ## Contributing to this repo
 

@@ -22,6 +22,6 @@ jobs:
     - name: Force safe directory
       run: git config --global --add safe.directory '*'
     - name: Download Resources
-      run: ./download-resources.sh master
+      run: ./resources.sh master
     - name: Build & Release
-      run: ./build-gcc.sh master
+      run: ./build.sh master
