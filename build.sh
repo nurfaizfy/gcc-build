@@ -146,11 +146,11 @@ build_gcc() {
     --target=${TARGET} \
     --with-gnu-as \
     --with-gnu-ld \
+    --with-headers=/usr/include \
     --with-newlib \
     --with-pkgversion="${PKG_VERSION} GCC" \
     --with-sysroot \
     --with-system-zlib \
-    --without-headers \
     --quiet ${EXTRA_CONF} |& tee -a build.log
   make all-gcc -j${NPROC} |& tee -a build.log
   make all-target-libgcc -j${NPROC} |& tee -a build.log
