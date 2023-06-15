@@ -133,6 +133,7 @@ build_gcc() {
     --disable-libvtv \
     --disable-nls \
     --disable-shared \
+    --enable-default-pie \
     --enable-default-ssp \
     --enable-gnu-indirect-function \
     --enable-languages=c,c++ \
