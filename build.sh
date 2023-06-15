@@ -14,7 +14,8 @@ OPT_FLAGS="-pipe -O3 -flto=${NPROC} -fipa-pta -fgraphite -fgraphite-identity -fl
 BUILD_DATE="$(cat ${WORK_DIR}/gcc/gcc/DATESTAMP)"
 BUILD_DAY="$(date "+%d %B %Y")"
 BUILD_TAG="$(date +%Y%m%d-%H%M-%Z)"
-TARGETS="x86_64-linux-gnu aarch64-linux-gnu"
+# Targets: aarch64-linux-gnu, x86_64-linux-gnu, arm-eabi
+TARGETS="aarch64-linux-gnu"
 HEAD_SCRIPT="$(git log -1 --oneline)"
 HEAD_GCC="$(git --git-dir gcc/.git log -1 --oneline)"
 HEAD_BINUTILS="$(git --git-dir binutils/.git log -1 --oneline)"
@@ -174,24 +175,33 @@ strip_binaries(){
 
   find install -type f -exec file {} \; > .file-idx
 
-  cp -rf ${PREFIX}/bin/x86_64-linux-gnu-strip ./stripp-x86 || true
-  cp -rf ${PREFIX}/bin/aarch64-linux-gnu-strip ./stripp-a64 || true
-  cp -rf ${PREFIX}/bin/arm-eabi-strip ./stripp-a32 || true
-
-  grep "x86-64" .file-idx |
-    grep "not strip" |
-    tr ':' ' ' | awk '{print $1}' |
-    while read -r file; do ./stripp-x86 -s "$file"; done
-
-  grep "ARM" .file-idx | grep "aarch64" |
-    grep "not strip" |
-    tr ':' ' ' | awk '{print $1}' |
-    while read -r file; do ./stripp-a64 -s "$file"; done
-
-  grep "ARM" .file-idx | grep "eabi" |
-    grep "not strip" |
-    tr ':' ' ' | awk '{print $1}' |
-    while read -r file; do ./stripp-a32 -s "$file"; done
+  for TARGET in ${TARGETS}; do
+    case $TARGET in
+      x86_64*)
+        grep "x86-64" .file-idx |
+          grep "not strip" |
+          tr ':' ' ' | awk '{print $1}' |
+          while read -r file
+            do strip -s "$file"
+          done;;
+      aarch64*)
+        cp -rf ${PREFIX}/bin/${TARGET}-strip ./stripp-a64
+        grep "ARM" .file-idx | grep "aarch64" |
+          grep "not strip" |
+          tr ':' ' ' | awk '{print $1}' |
+          while read -r file
+            do ./stripp-a64 -s "$file"
+          done;;
+      arm*)
+        cp -rf ${PREFIX}/bin/${TARGET}-strip ./stripp-a32
+        grep "ARM" .file-idx | grep "eabi" |
+          grep "not strip" |
+          tr ':' ' ' | awk '{print $1}' |
+          while read -r file
+            do ./stripp-a32 -s "$file"
+          done;;
+    esac
+  done
 
   # clean unused files
   rm -rf stripp-* .file-idx
@@ -199,7 +209,7 @@ strip_binaries(){
 
 git_push(){
   send_info "<b>GitHub Action : </b><pre>Release into GitHub . . .</pre>"
-  GCC_CONFIG="$(${PREFIX}/bin/aarch64-linux-gnu-gcc -v)"
+  GCC_CONFIG="$(${PREFIX}/bin/aarch64-linux-gnu-gcc -v 2>&1)"
   GCC_VERSION="$(${PREFIX}/bin/aarch64-linux-gnu-gcc --version | head -n1 | cut -d' ' -f5)"
   BINUTILS_VERSION="$(${PREFIX}/bin/aarch64-linux-gnu-ld --version | head -n1 | cut -d' ' -f6)"
   MESSAGE="GCC: ${GCC_VERSION}-${BUILD_DATE}, Binutils: ${BINUTILS_VERSION}"
