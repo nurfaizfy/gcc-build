@@ -121,7 +121,6 @@ build_gcc() {
     --disable-decimal-float \
     --disable-docs \
     --disable-gcov \
-    --disable-host-shared \
     --disable-libcc1 \
     --disable-libffi \
     --disable-libgomp \
@@ -145,7 +144,6 @@ build_gcc() {
     --with-gnu-ld \
     --with-newlib \
     --with-pkgversion="${PKG_VERSION} GCC" \
-    --with-stage1-ldflags="-static-libstdc++ -static-libgcc -static" \
     --with-sysroot \
     --quiet ${EXTRA_CONF} |& tee -a build.log
   make all-gcc -j${NPROC} |& tee -a build.log
