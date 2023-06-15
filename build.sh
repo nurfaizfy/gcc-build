@@ -82,6 +82,7 @@ build_binutils() {
     --target=${TARGET} \
     --with-pkgversion="${PKG_VERSION} Binutils" \
     --with-sysroot \
+    --with-system-zlib \
     --quiet |& tee -a build.log
   make -j${NPROC} |& tee -a build.log
   make install -j${NPROC} |& tee -a build.log
@@ -145,6 +146,7 @@ build_gcc() {
     --with-newlib \
     --with-pkgversion="${PKG_VERSION} GCC" \
     --with-sysroot \
+    --with-system-zlib \
     --quiet ${EXTRA_CONF} |& tee -a build.log
   make all-gcc -j${NPROC} |& tee -a build.log
   make all-target-libgcc -j${NPROC} |& tee -a build.log
