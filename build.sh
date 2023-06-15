@@ -72,6 +72,7 @@ build_binutils() {
     --disable-docs \
     --disable-gdb \
     --disable-gprofng \
+    --disable-multilib \
     --disable-nls \
     --disable-shared \
     --enable-gold \
