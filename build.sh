@@ -78,7 +78,9 @@ build_binutils() {
     --disable-shared \
     --enable-gold \
     --enable-ld=default \
+    --enable-plugins \
     --enable-threads \
+    --enable-64-bit-bfd \
     --prefix=${PREFIX} \
     --program-prefix=${TARGET}- \
     --target=${TARGET} \
@@ -133,6 +135,7 @@ build_gcc() {
     --disable-libstdcxx-debug \
     --disable-libstdcxx-pch \
     --disable-libvtv \
+    --disable-multilib \
     --disable-nls \
     --disable-shared \
     --enable-default-pie \
@@ -213,6 +216,11 @@ git_push(){
   GCC_VERSION="$(${PREFIX}/bin/aarch64-linux-gnu-gcc --version | head -n1 | cut -d' ' -f5)"
   BINUTILS_VERSION="$(${PREFIX}/bin/aarch64-linux-gnu-ld --version | head -n1 | cut -d' ' -f6)"
   MESSAGE="GCC: ${GCC_VERSION}-${BUILD_DATE}, Binutils: ${BINUTILS_VERSION}"
+
+  # symlink liblto_plugin.so
+  cd ${PREFIX}/lib/bfd-plugins
+  ln -sr ../../libexec/gcc/aarch64-linux-gnu/${GCC_VERSION}/liblto_plugin.so .
+
   git config --global user.name "${GITHUB_USER}"
   git config --global user.email "${GITHUB_EMAIL}"
   if [ "${IS_MASTER}" == "master" ]; then
