@@ -207,6 +207,9 @@ strip_binaries(){
   done
 
   # clean unused files
+  find install -name *.cmake -delete
+  find install -name *.la -delete
+  find install -name *.a -delete
   rm -rf stripp-* .file-idx
 }
 
