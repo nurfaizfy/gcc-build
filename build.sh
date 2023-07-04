@@ -19,7 +19,7 @@ TARGETS="aarch64-linux-gnu"
 HEAD_SCRIPT="$(git log -1 --oneline)"
 HEAD_GCC="$(git --git-dir gcc/.git log -1 --oneline)"
 HEAD_BINUTILS="$(git --git-dir binutils/.git log -1 --oneline)"
-PKG_VERSION="CAT (=^ェ^=)"
+PKG_VERSION="CAT"
 IS_MASTER="${1}"
 export PKG_VERSION WORK_DIR NPROC PREFIX OPT_FLAGS BUILD_DATE BUILD_DAY BUILD_TAG TARGETS HEAD_SCRIPT HEAD_GCC HEAD_BINUTILS IS_MASTER
 
