@@ -15,7 +15,7 @@ BUILD_DATE="$(cat ${WORK_DIR}/gcc/gcc/DATESTAMP)"
 BUILD_DAY="$(date "+%d %B %Y")"
 BUILD_TAG="$(date +%Y%m%d-%H%M-%Z)"
 # Targets: aarch64-linux-gnu, x86_64-linux-gnu, arm-eabi
-TARGETS="aarch64-linux-gnu x86_64-linux-gnu"
+TARGETS="x86_64-linux-gnu aarch64-linux-gnu"
 HEAD_SCRIPT="$(git log -1 --oneline)"
 HEAD_GCC="$(git --git-dir gcc/.git log -1 --oneline)"
 HEAD_BINUTILS="$(git --git-dir binutils/.git log -1 --oneline)"
@@ -72,11 +72,11 @@ build_binutils() {
     --disable-compressed-debug-sections \
     --disable-docs \
     --disable-gdb \
+    --disable-gold \
     --disable-gprofng \
     --disable-multilib \
     --disable-nls \
     --disable-shared \
-    --enable-gold \
     --enable-ld=default \
     --enable-plugins \
     --enable-threads \
