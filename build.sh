@@ -111,13 +111,20 @@ build_gcc() {
   # Check compiler first
   gcc -v |& tee -a build.log
   ld -v |& tee -a build.log
-  if [ "${TARGET}" == "aarch64-linux-gnu" ]; then
-    EXTRA_CONF="\
-      --enable-fix-cortex-a53-835769 \
-      --enable-fix-cortex-a53-843419"
-  elif [ "${TARGET}" == "x86_64-linux-gnu" ]; then
-    EXTRA_CONF="--without-cuda-driver"
-  fi
+
+  case $TARGET in
+    x86_64*)
+      EXTRA_CONF="--without-cuda-driver"
+      ;;
+    aarch64*)
+      EXTRA_CONF="--enable-fix-cortex-a53-835769 \
+        --enable-fix-cortex-a53-843419 \
+        --with-headers=/usr/include"
+      ;;
+    arm*)
+      EXTRA_CONF="--with-headers=/usr/include"
+      ;;
+  esac
 
   env CFLAGS="${OPT_FLAGS}" CXXFLAGS="${OPT_FLAGS}" \
     ../gcc/configure \
@@ -149,7 +156,6 @@ build_gcc() {
     --target=${TARGET} \
     --with-gnu-as \
     --with-gnu-ld \
-    --with-headers=/usr/include \
     --with-newlib \
     --with-pkgversion="${PKG_VERSION} GCC" \
     --with-sysroot \
@@ -220,16 +226,12 @@ git_push(){
   BINUTILS_VERSION="$(${PREFIX}/bin/aarch64-linux-gnu-ld --version | head -n1 | cut -d' ' -f6)"
   MESSAGE="GCC: ${GCC_VERSION}-${BUILD_DATE}, Binutils: ${BINUTILS_VERSION}"
 
-  # symlink liblto_plugin.so
-  cd ${PREFIX}/lib/bfd-plugins
-  ln -sr ../../libexec/gcc/aarch64-linux-gnu/${GCC_VERSION}/liblto_plugin.so .
-
-  git config --global user.name "${GITHUB_USER}"
-  git config --global user.email "${GITHUB_EMAIL}"
+  git config --global user.name github-actions[bot]
+  git config --global user.email github-actions[bot]@users.noreply.github.com
   if [ "${IS_MASTER}" == "master" ]; then
-    git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_USER}"/gcc ${WORK_DIR}/gcc-repo -b main
+    git clone https://Diaz1401:"${GITHUB_TOKEN}"@github.com/Mengkernel/gcc ${WORK_DIR}/gcc-repo -b main
   else
-    git clone https://"${GITHUB_USER}":"${GITHUB_TOKEN}"@github.com/"${GITHUB_USER}"/gcc-stable ${WORK_DIR}/gcc-repo -b main
+    git clone https://Diaz1401:"${GITHUB_TOKEN}"@github.com/Diaz1401/gcc-stable ${WORK_DIR}/gcc-repo -b main
   fi
   # Generate archive
   cd ${WORK_DIR}/gcc-repo
