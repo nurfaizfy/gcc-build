@@ -19,7 +19,7 @@ TARGETS="x86_64-linux-gnu aarch64-linux-gnu"
 HEAD_SCRIPT="$(git log -1 --oneline)"
 HEAD_GCC="$(git --git-dir gcc/.git log -1 --oneline)"
 HEAD_BINUTILS="$(git --git-dir binutils/.git log -1 --oneline)"
-PKG_VERSION="CAT"
+PKG_VERSION="Gonon"
 IS_MASTER="${1}"
 export PKG_VERSION WORK_DIR NPROC PREFIX OPT_FLAGS BUILD_DATE BUILD_DAY BUILD_TAG TARGETS HEAD_SCRIPT HEAD_GCC HEAD_BINUTILS IS_MASTER
 
@@ -228,11 +228,7 @@ git_push(){
 
   git config --global user.name github-actions[bot]
   git config --global user.email github-actions[bot]@users.noreply.github.com
-  if [ "${IS_MASTER}" == "master" ]; then
-    git clone https://Diaz1401:"${GITHUB_TOKEN}"@github.com/Mengkernel/gcc ${WORK_DIR}/gcc-repo -b main
-  else
-    git clone https://Diaz1401:"${GITHUB_TOKEN}"@github.com/Diaz1401/gcc-stable ${WORK_DIR}/gcc-repo -b main
-  fi
+  git clone https://nurfaizfy:"${GITHUB_TOKEN}"@github.com/Gonon-Kernel/gonon-gcc ${WORK_DIR}/gcc-repo -b main
   # Generate archive
   cd ${WORK_DIR}/gcc-repo
   cp -rf ${PREFIX}/* .
