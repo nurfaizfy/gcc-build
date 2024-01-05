@@ -222,10 +222,11 @@ strip_binaries(){
 git_push(){
   send_info "<b>GitHub Action : </b><pre>Release into GitHub . . .</pre>"
   GCC_CONFIG="$(${PREFIX}/bin/aarch64-linux-gnu-gcc -v 2>&1)"
-  GCC_VERSION="$(${PREFIX}/bin/aarch64-linux-gnu-gcc --version | head -n1 | cut -d' ' -f5)"
-  BINUTILS_VERSION="$(${PREFIX}/bin/aarch64-linux-gnu-ld --version | head -n1 | cut -d' ' -f6)"
+  GCC_VERSION="$(${PREFIX}/bin/aarch64-linux-gnu-gcc --version | head -n1 | cut -d' ' -f4)"
+  BUILD_DATE="$(${PREFIX}/bin/aarch64-linux-gnu-gcc --version | head -n1 | cut -d' ' -f5)"
+  BINUTILS_VERSION="$(${PREFIX}/bin/aarch64-linux-gnu-ld --version | head -n1 | cut -d' ' -f5)"
   MESSAGE="GononGCC-${GCC_VERSION}-${BUILD_DATE}"
-  BUILD_TAG="${GCC_VERSION}-$(date +%Y%m%d)-release"
+  BUILD_TAG="${GCC_VERSION}-${BUILD_DATE}-release"
 
   git config --global user.name github-actions[bot]
   git config --global user.email github-actions[bot]@users.noreply.github.com
