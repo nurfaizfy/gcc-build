@@ -224,7 +224,8 @@ git_push(){
   GCC_CONFIG="$(${PREFIX}/bin/aarch64-linux-gnu-gcc -v 2>&1)"
   GCC_VERSION="$(${PREFIX}/bin/aarch64-linux-gnu-gcc --version | head -n1 | cut -d' ' -f5)"
   BINUTILS_VERSION="$(${PREFIX}/bin/aarch64-linux-gnu-ld --version | head -n1 | cut -d' ' -f6)"
-  MESSAGE="GCC: ${GCC_VERSION}-${BUILD_DATE}, Binutils: ${BINUTILS_VERSION}"
+  MESSAGE="GononGCC-${GCC_VERSION}-${BUILD_DATE}"
+  BUILD_TAG="${GCC_VERSION}-$(date +%Y%m%d)-release"
 
   git config --global user.name github-actions[bot]
   git config --global user.email github-actions[bot]@users.noreply.github.com
@@ -232,15 +233,15 @@ git_push(){
   # Generate archive
   cd ${WORK_DIR}/gcc-repo
   cp -rf ${PREFIX}/* .
-  tar -I"${PREFIX}/bin/zstd --ultra -22 -T0" -cf gcc.tar.zst *
+  #tar -I"${PREFIX}/bin/zstd --ultra -22 -T0" -cf gcc.tar.zst *
+  tar -czvf "${MESSAGE}.tar.gz" *
   cat README |
-    sed s/GCCVERSION/$(echo ${GCC_VERSION}-${BUILD_DATE})/g |
-    sed s/BINUTILSVERSION/$(echo ${BINUTILS_VERSION})/g > README.md
+    sed "s/GCCVERSION/${MESSAGE}/g; s/BINUTILSVERSION/${BINUTILS_VERSION}/g" README > README.md
   git commit --allow-empty -as \
     -m "${MESSAGE}" \
     -m "${GCC_CONFIG}"
   git push origin main
-  hub release create -a gcc.tar.zst -m "${MESSAGE}" ${BUILD_TAG}
+  hub release create -a "${MESSAGE}.tar.gz" -m "${MESSAGE}" ${BUILD_TAG}
   cd -
 }
 
@@ -251,7 +252,7 @@ send_info "
 <b>Script </b><pre>${HEAD_SCRIPT}</pre>
 <b>GCC </b><pre>${HEAD_GCC}</pre>
 <b>Binutils </b><pre>${HEAD_BINUTILS}</pre>"
-build_zstd
+#build_zstd
 for TARGET in ${TARGETS}; do
   build_binutils
   build_gcc
